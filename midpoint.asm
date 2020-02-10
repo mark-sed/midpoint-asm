@@ -12,9 +12,6 @@
 
 ;; Exported functions
 global midpoint         ;; Function for rastering circle using midpoint algorithm
-extern put8lines
-
-;; Macros
 
 ;; Global variables
 section .data
@@ -23,7 +20,6 @@ __CONST_1       times 32 db 1
 
 ;; Code
 section .text
-
 
 ;; MIDPOINT 
 ;; Circle rendering into a 2D array of bytes using midpoint algorithm 
@@ -40,6 +36,7 @@ midpoint:
         push r12
         push r13
         push r14
+        push r15
 
         xor rax, rax                            ;; x = 0; rcx = y
         mov r8, 1
@@ -48,7 +45,7 @@ midpoint:
         sub r8, rcx                             ;; p = 1 - r
         shl r10, 1                              ;; r * 2
         sub r10, 2                              ;; y2 = r * 2 - 2
-        ;vmovaps ymm0, [__CONST_1]               ;; Load all ones to ymm reg
+        vmovaps ymm0, [__CONST_1]               ;; Load all ones to ymm reg
 
 .while:
         cmp rax, rcx
@@ -68,6 +65,15 @@ midpoint:
         sub r15, rax
         shl r15, 3
         mov r14, [rdi+r15]
+.for_y_vec:
+        add rbx, 32
+        cmp rbx, r12
+        jge short .for_y_vec_end                ;; Finish the rasterization in serial way
+        vmovups [r13+rbx-32], ymm0
+        vmovups [r14+rbx-32], ymm0
+        jmp short .for_y_vec
+.for_y_vec_end:
+        sub rbx, 32
 .for_y:
         cmp rbx, r12
         jge .end_for_y                          ;; rbx >= s2 + y
@@ -76,7 +82,6 @@ midpoint:
 
         add rbx, 1
         jmp short .for_y
-        jmp .end
 .end_for_y:
 
         mov r12, rdx
@@ -93,9 +98,18 @@ midpoint:
         sub r15, rcx
         shl r15, 3
         mov r14, [rdi+r15]
+.for_x_vec:
+        add rbx, 32
+        cmp rbx, r12
+        jge .for_x_vec_end                      ;; Finish the rasterization in serial way
+        vmovups [r13+rbx-32], ymm0
+        vmovups [r14+rbx-32], ymm0
+        jmp short .for_x_vec
+.for_x_vec_end:
+        sub rbx, 32
 .for_x:
         cmp rbx, r12
-        jge .end_for_x                          ;; rbx >= s2 + y
+        jge .end_for_x                          ;; rbx >= s2 + x
         mov byte[r13+rbx], 1
         mov byte[r14+rbx], 1
 
@@ -115,6 +129,7 @@ midpoint:
         jmp .while
 
 .end:
+        pop r15
         pop r14
         pop r13
         pop r12
