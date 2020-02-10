@@ -48,7 +48,7 @@ midpoint:
         sub r8, rcx                             ;; p = 1 - r
         shl r10, 1                              ;; r * 2
         sub r10, 2                              ;; y2 = r * 2 - 2
-        vmovaps ymm0, [__CONST_1]               ;; Load all ones to ymm reg
+        ;vmovaps ymm0, [__CONST_1]               ;; Load all ones to ymm reg
 
 .while:
         cmp rax, rcx
@@ -58,23 +58,50 @@ midpoint:
         add r12, rcx                            ;; r12 = s2 + y
         mov rbx, rdx                            ;; Loop counter
         sub rbx, rcx                            ;; rbx = s2 - y
-        mov r13, rsi
-        mov r14, rsi
-        add r13, rax                            ;; s1 + x
-        sub r14, rax                            ;; s1 - x
-        mov r13, [rdi + r13]                    ;; Load midpoint[s1 + x]
-        mov r14, [rdi + r14]                    ;; Load midpoint[s1 - x]
+
+        mov r15, rsi                            ;; Load s1+x
+        add r15, rax
+        shl r15, 3
+        mov r13, [rdi+r15]
+
+        mov r15, rsi                            ;; Load s1-x
+        sub r15, rax
+        shl r15, 3
+        mov r14, [rdi+r15]
 .for_y:
-        ;; TODO: add serial approach for width<32 
         cmp rbx, r12
         jge .end_for_y                          ;; rbx >= s2 + y
-        vmovups [r13 + rbx], ymm0
+        mov byte[r13+rbx], 1
+        mov byte[r14+rbx], 1
 
-        add rbx, 32
+        add rbx, 1
         jmp short .for_y
-
+        jmp .end
 .end_for_y:
+
+        mov r12, rdx
+        add r12, rax                            ;; r12 = s2 + x
+        mov rbx, rdx                            ;; Loop counter
+        sub rbx, rax                            ;; rbx = s2 - x
+
+        mov r15, rsi                            ;; Load s1+y
+        add r15, rcx
+        shl r15, 3
+        mov r13, [rdi+r15]
+
+        mov r15, rsi                            ;; Load s1-y
+        sub r15, rcx
+        shl r15, 3
+        mov r14, [rdi+r15]
 .for_x:
+        cmp rbx, r12
+        jge .end_for_x                          ;; rbx >= s2 + y
+        mov byte[r13+rbx], 1
+        mov byte[r14+rbx], 1
+
+        add rbx, 1
+        jmp short .for_x
+.end_for_x: 
 
         cmp r8, 0
         jl .p_neg                               ;; if p >= 0
@@ -85,7 +112,7 @@ midpoint:
         add r8, r9                              ;; p += x2
         add r9, 2                               ;; x2 += 2
         inc rax                                 ;; x += 1
-        jmp short .while
+        jmp .while
 
 .end:
         pop r14

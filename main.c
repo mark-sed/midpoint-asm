@@ -22,6 +22,7 @@ int main(int argc, char *argv[]){
     for(long i = 0; i < WIDTH; i++){
         bmap[i] = malloc(HEIGHT * sizeof(uint8_t));
     }
+    
 
     midpoint(bmap, WIDTH/2, HEIGHT/2, WIDTH/2-2);
     
