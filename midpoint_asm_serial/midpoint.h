@@ -5,8 +5,8 @@
 
 #define PIXEL_DRAWN 1
 #define PIXEL_EMPTY 0
-#define WIDTH 7860
-#define HEIGHT 7860
+#define WIDTH 8000
+#define HEIGHT 8000
 
 void midpoint(uint8_t **midpoint, long s1, long s2, long r);
 

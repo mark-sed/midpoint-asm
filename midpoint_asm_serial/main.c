@@ -8,12 +8,14 @@ int main(int argc, char *argv[]){
     for(long i = 0; i < WIDTH; i++){
         bmap[i] = malloc(HEIGHT * sizeof(uint8_t));
     }
+    
 
-    midpoint(bmap, WIDTH/2, WIDTH/2, 7680/2);
+    midpoint(bmap, WIDTH/2, HEIGHT/2, 7680/2);
+    
     
     /*for(int x = 0; x < WIDTH; x++){
         for(int y = 0; y < HEIGHT; y++){
-            printf("%s ", bmap[x][y] ? "\x1b[7m " : "\x1b[0m ");
+            printf("%c ", bmap[x][y] ? 'o' : '_');
         }
         printf("\n");
     }*/
