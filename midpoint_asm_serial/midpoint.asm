@@ -11,7 +11,7 @@
 ;;
 
 ;; Exported functions
-global midpoint         ;; Function for rastering circle using midpoint algorithm
+global midpoint         ;; Function for rasterizng circle using midpoint algorithm
 extern put8lines
 
 ;; Macros
@@ -48,7 +48,6 @@ midpoint:
         sub r8, rcx                             ;; p = 1 - r
         shl r10, 1                              ;; r * 2
         sub r10, 2                              ;; y2 = r * 2 - 2
-        ;vmovaps ymm0, [__CONST_1]               ;; Load all ones to ymm reg
 
 .while:
         cmp rax, rcx

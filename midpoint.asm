@@ -11,7 +11,7 @@
 ;;
 
 ;; Exported functions
-global midpoint         ;; Function for rastering circle using midpoint algorithm
+global midpoint         	;; Function for rastering circle using midpoint algorithm
 
 ;; Global variables
 section .data
